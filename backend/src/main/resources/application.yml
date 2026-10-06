@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: writing-assistant-backend
+
+server:
+  port: 8080
+
+ai:
+  # Any OpenAI-compatible provider. Defaults to Google Gemini (free tier).
+  # Secret: provided only through the environment, never committed.
+  api-key: ${AI_API_KEY:}
+  model: ${AI_MODEL:gemini-3.1-flash-lite}
+  base-url: ${AI_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
+  max-tokens: 2048
+
+app:
+  cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
+  rate-limit-per-minute: ${RATE_LIMIT_PER_MINUTE:20}
