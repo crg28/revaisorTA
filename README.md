@@ -94,10 +94,3 @@ npm install
 npm run dev
 ```
 
-## Deploy to the cloud
-
-Any host that runs containers works (Render, Railway, Fly.io, Cloud Run, ECS…):
-
-1. Deploy `backend/` as a container. Set `AI_API_KEY` as a **secret** and `CORS_ALLOWED_ORIGINS` to the frontend's public URL.
-2. Deploy `frontend/` as a container, building with `--build-arg NEXT_PUBLIC_API_URL=https://<your-backend-url>` (the value is baked in at build time).
-3. Serve both over HTTPS.

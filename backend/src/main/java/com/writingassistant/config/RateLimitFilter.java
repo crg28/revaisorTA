@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 
 /**
@@ -23,6 +25,7 @@ import reactor.core.publisher.Mono;
 @Order(0)
 public class RateLimitFilter implements WebFilter {
 
+    private static final PathPattern REWRITE_PATH = PathPatternParser.defaultInstance.parse("/api/rewrite");
     private static final long WINDOW_MS = 60_000;
     private static final int MAX_TRACKED_CLIENTS = 10_000;
 
@@ -38,7 +41,9 @@ public class RateLimitFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         var request = exchange.getRequest();
-        boolean limited = request.getMethod() == HttpMethod.POST && request.getPath().value().equals("/api/rewrite");
+        // Same matcher the router uses, so ";x=1" and "%72" tricks can't dodge the limit.
+        boolean limited = request.getMethod() == HttpMethod.POST
+                && REWRITE_PATH.matches(request.getPath().pathWithinApplication());
         if (!limited || tryAcquire(clientKey(exchange), System.currentTimeMillis())) {
             return chain.filter(exchange);
         }
